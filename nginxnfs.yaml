@@ -27,3 +27,16 @@ spec:
           nfs:
             server: 172.16.64.238 # Please change this to your NFS server
             path: /mnt/hd1 # Please change this to the relevant share
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx
+spec:
+  ports:
+  - port: 80
+    protocol: TCP
+  selector:
+    app: nginx
+  type: NodePort
