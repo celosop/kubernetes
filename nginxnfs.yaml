@@ -30,7 +30,7 @@ spec:
 
 ---
 apiVersion: v1
-kind: Service
+kind: Service #faz com que o kubernetes crie um serviço e exponha a porta 80 do container numa porta aleatória
 metadata:
   name: nginx
 spec:
