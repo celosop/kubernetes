@@ -39,4 +39,4 @@ spec:
     protocol: TCP
   selector:
     app: nginx
-  type: NodePort
+  type: NodePort #existem 3 tipos de serviços, NodePort, ClusterIP e LoadBalancer
