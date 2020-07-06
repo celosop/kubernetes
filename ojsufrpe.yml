@@ -1,29 +1,83 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: nginx-deployment
+  name: ojs
   labels:
-    app: nginx
+    app: ojs
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: nginx
+      app: ojs
   template:
     metadata:
       labels:
-        app: nginx
+        app: ojs
     spec:
       containers:
-        - name: nginx
-          image: nginx:1.17.8
+        - name: ojs
+          image: pkpofficial/ojs:3_2_1-1
           ports:
-          - containerPort: 80
-          volumeMounts:
-            - name: nfs-volume
-              mountPath: /usr/share/nginx/html/ # Please change the destination you like the share to be mounted too
-      volumes:
-        - name: nfs-volume
-          nfs:
-            server: 172.16.64.238 # Please change this to your NFS server
-            path: /mnt/hd1 # Please change this to the relevant share
+          - containerPort: 8080
+            name: http
+            protocol: TCP
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ojs-service
+spec:
+  ports:
+  - port: 80
+    protocol: TCP
+  selector:
+    app: ojs
+  type: NodePort
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql
+spec:
+  ports:
+  - port: 3306
+  selector:
+    app: mysql
+  clusterIP: None
+---
+apiVersion: apps/v1 # for versions before 1.9.0 use apps/v1beta2
+kind: Deployment
+metadata:
+  name: mysql
+spec:
+  selector:
+    matchLabels:
+      app: mysql
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: mysql
+    spec:
+      containers:
+      - image: mysql:5.6
+        name: mysql
+        env:
+          # Use secret in real usage
+        - name: MYSQL_ROOT_PASSWORD
+          value: ojsPwd
+        - name: MYSQL_DATABASE
+          value: ojs
+        - name: MYSQL_USER
+          value: ojs
+        - name: MYSQL_PASSWORD
+          value: ojsPwd
+        ports:
+        - containerPort: 3306
+          name: mysql
+        volumeMounts:
+        - name: mysql-storage
+          mountPath: /var/lib/mysql
