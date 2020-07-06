@@ -68,13 +68,7 @@ spec:
         env:
           # Use secret in real usage
         - name: MYSQL_ROOT_PASSWORD
-          value: ojsPwd
-        - name: MYSQL_DATABASE
-          value: ojs
-        - name: MYSQL_USER
-          value: ojs
-        - name: MYSQL_PASSWORD
-          value: ojsPwd
+          value: password
         ports:
         - containerPort: 3306
           name: mysql
