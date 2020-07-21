@@ -21,6 +21,14 @@ spec:
           - containerPort: 80
             name: http
             protocol: TCP
+          volumeMounts:
+            - name: nfs-volume
+              mouthPath: /var/www/html
+      volumes:
+        - name: nfs-volume
+          nfs:
+            server: 172.16.64.238
+            path: /mnt/hd1
 
 ---
 apiVersion: v1
