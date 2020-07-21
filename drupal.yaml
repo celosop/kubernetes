@@ -23,7 +23,7 @@ spec:
             protocol: TCP
           volumeMounts:
             - name: nfs-volume
-              mouthPath: /var/www/html
+              mountPath: /var/www/html
       volumes:
         - name: nfs-volume
           nfs:
