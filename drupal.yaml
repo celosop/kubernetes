@@ -1,3 +1,45 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: drupal-service
+spec:
+  ports:
+  - port: 80
+    protocol: TCP
+  selector:
+    app: drupal
+  type: NodePort
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: drupal-pv-claim
+  labels:
+    app: drupal
+spec:
+  storageClassName: manuale
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 2Gi
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: drupal-pv-volume
+  labels:
+    type: local
+spec:
+  storageClassName: manuale
+  capacity:
+    storage: 2Gi
+  accessModes:
+    - ReadWriteOnce
+  nfs:
+    path: /mnt/hd2
+    server: 172.16.64.238
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -22,23 +64,12 @@ spec:
             name: http
             protocol: TCP
           volumeMounts:
-            - name: nfs-volume
+            - name: drupal-persistent-storage
+              mountPath: /var/lib/mysql
+              subPath: data
+            - name: drupal-persistent-storage
               mountPath: /var/www/html
       volumes:
-        - name: nfs-volume
-          nfs:
-            server: 172.16.64.238
-            path: /mnt/hd1
-
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: drupal-service
-spec:
-  ports:
-  - port: 80
-    protocol: TCP
-  selector:
-    app: drupal
-  type: NodePort
+        - name: drupal-persistent-storage
+          persistentVolumeClaim:
+            claimName: drupal-pv-claim
