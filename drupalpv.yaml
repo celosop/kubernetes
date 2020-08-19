@@ -49,7 +49,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: drupal-1
-    labels:
+  labels:
     app: drupal-1
   namespace: drupal
 spec:
