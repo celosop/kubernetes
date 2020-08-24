@@ -5,29 +5,6 @@ metadata:
   labels:
     app: nodejs-image-demo
 spec:
-  replicas: 3
-  selector:
-    matchLabels:
-      app: nodejs-image-demo
-  template:
-    metadata:
-      labels:
-        app: nodejs-image-demo
-    spec:
-      containers:
-      - name: nodejs-image-demo
-        image: celosop/nodejs-image-demo:2
-        ports:
-        - containerPort: 8080
-        
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: nodejs-image-demo
-  labels:
-    app: nodejs-image-demo
-spec:
   replicas: 1
   selector:
     matchLabels:
