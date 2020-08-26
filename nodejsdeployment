@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nodejs-image-demo
+  labels:
+    app: nodejs-image-demo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nodejs-image-demo
+  template:
+    metadata:
+      labels:
+        app: nodejs-image-demo
+    spec:
+      containers:
+        - name: nodejs-image-demo
+          image: celosop/nodejs-image-demo:2
+          ports:
+          - containerPort: 8080
+          volumeMounts:
+            - name: nfs-volume-node
+              mountPath: /home/app # Please change the destination you like the share to be mounted too
+      volumes:
+        - name: nfs-volume-node
+          nfs:
+            server: 172.16.64.238 # Please change this to your NFS server
+            path: /mnt/hd2/nodejs
+
+---
+apiVersion: v1
+kind: Service #faz com que o kubernetes crie um serviço e exponha a porta 80 do container numa porta aleatória
+metadata:
+  name: nodejs-image-demo
+spec:
+  ports:
+  - port: 80
+    protocol: TCP
+  selector:
+    app: nodejs-image-demo
+  type: NodePort #existem 3 tipos de serviços, NodePort, ClusterIP e LoadBalancer

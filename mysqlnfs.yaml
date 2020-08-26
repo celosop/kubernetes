@@ -55,7 +55,7 @@ spec:
   accessModes:
     - ReadWriteOnce
   nfs:
-    path: /mnt/hd1
+    path: /mnt/hd2
     server: 172.16.64.238
 ---
 apiVersion: v1
