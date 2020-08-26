@@ -26,7 +26,7 @@ spec:
         - name: nfs-volume
           nfs:
             server: 172.16.64.238 # Please change this to your NFS server
-            path: /mnt/hd1
+            path: /mnt/hd2
 
 ---
 apiVersion: v1
