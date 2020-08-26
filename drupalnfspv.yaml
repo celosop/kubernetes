@@ -1,0 +1,81 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: drupal-service-1
+  namespace: drupal
+spec:
+  ports:
+  - port: 80
+    nodePort: 31111
+    protocol: TCP
+  selector:
+    app: drupal-1
+  type: NodePort
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: drupal-pv-claim-1
+  namespace: drupal
+  labels:
+    app: drupal-1
+spec:
+  storageClassName: manual
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 2Gi
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: drupal-pv-volume-1
+  labels:
+    type: local
+  namespace: drupal
+spec:
+  storageClassName: manual
+  capacity:
+    storage: 2Gi
+  accessModes:
+    - ReadWriteOnce
+  nfs:
+    path: /mnt/hd2
+    server: 172.16.64.238
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: drupal-1
+  labels:
+    app: drupal-1
+  namespace: drupal
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: drupal-1
+  template:
+    metadata:
+      labels:
+        app: drupal-1
+    spec:
+      containers:
+        - name: drupal-1
+          image: celosop/drupal8
+          ports:
+          - containerPort: 80
+            name: http
+            protocol: TCP
+          volumeMounts:
+            - name: drupal-persistent-storage-1
+              mountPath: /var/lib/mysql
+              subPath: data
+            - name: drupal-persistent-storage-1
+              mountPath: /var/www/html
+      volumes:
+        - name: drupal-persistent-storage-1
+          persistentVolumeClaim:
+            claimName: drupal-pv-claim-1
