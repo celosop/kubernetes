@@ -1,6 +1,51 @@
 apiVersion: v1
 kind: Service
 metadata:
+  name: db-ojs
+spec:
+  ports:
+  - port: 3306
+  selector:
+    app: db-ojs
+  clusterIP: None
+
+---
+
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: ojsdb-pv-volume
+  labels:
+    type: local
+spec:
+  storageClassName: manualojs
+  capacity:
+    storage: 2Gi
+  accessModes:
+    - ReadWriteOnce
+  nfs:
+    path: /mnt/hd2/ojs
+    server: 172.16.64.238
+
+---
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: ojsdb-pv-claim
+spec:
+  storageClassName: manualojs
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 2Gi
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
   name: ojs-service
 spec:
   ports:
@@ -10,20 +55,21 @@ spec:
   selector:
     app: ojs
   type: NodePort
+
 ---
 
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    io.kompose.service: db
     app: db-ojs
   name: db-ojs
 spec:
-  replicas: 1
   selector:
     matchLabels:
       app: db-ojs
+  strategy:
+    type: Recreate
   template:
     metadata:
       labels:
@@ -41,7 +87,13 @@ spec:
           value: ojs
         image: mariadb:10.2
         name: ojs-db
-      volumes: null
+        volumeMounts:
+        - name: ojsdb-persistent-storage
+          mountPath: /var/lib/mysql
+      volumes:
+      - name: ojsdb-persistent-storage
+        persistentVolumeClaim:
+          claimName: ojsdb-pv-claim
 
 ---
 apiVersion: apps/v1
