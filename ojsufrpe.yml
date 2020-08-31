@@ -112,10 +112,25 @@ spec:
       labels:
         app: ojs
     spec:
+      initContainers:
+      - name: init-ojs
+        image: celosop/ojsufrpe:3
+        command: ['sh', '-c', "cp -rP /var/www/html/* /tmp/"]
+        volumeMounts:
+          - name: ojsvolume
+            mountPath: /tmp/
       containers:
-        - name: ojs
-          image: celosop/ojsufrpe:3
-          ports:
-          - containerPort: 8080
-            name: http
-            protocol: TCP
+      - name: ojs
+        image: celosop/ojsufrpe:3
+        ports:
+        - containerPort: 8080
+          name: http
+          protocol: TCP
+        volumeMounts:
+          - name: ojsvolume
+            mountPath: /var/www/html/
+      volumes:
+        - name: ojsvolume
+          nfs:
+            server: 172.16.64.238
+            path: /mnt/hd2/ojs
