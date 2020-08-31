@@ -15,10 +15,10 @@ spec:
       initContainers:
       - name: init-nginx
         image: nginx:1.19
-        command: ['/bin/bash', '-c', "cp -rP /usr/share/nginx/html/* /var/log/"]
+        command: ['/bin/bash', '-c', "cp -rP /usr/share/nginx/html/* /tmp/"]
         volumeMounts:
           - name: nginxvolume
-            mountPath: /var/log/
+            mountPath: /tmp/
       containers:
       - name: nginx
         image: nginx:1.19
