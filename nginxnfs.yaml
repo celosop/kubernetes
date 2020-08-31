@@ -1,32 +1,38 @@
-apiVersion: apps/v1
+apiVersion: apps/v1 # for versions before 1.9.0 use apps/v1beta2
 kind: Deployment
 metadata:
   name: nginx-deployment
-  labels:
-    app: nginx
 spec:
-  replicas: 1
   selector:
     matchLabels:
       app: nginx
+  replicas: 1 # tells deployment to run 2 pods matching the template
   template:
     metadata:
       labels:
         app: nginx
     spec:
+      initContainers:
+      - name: init-nginx
+        image: nginx:1.19
+        command: ['/bin/bash', '-c', "cp -rP /usr/share/nginx/html/* /var/log/"]
+        volumeMounts:
+          - name: nginxvolume
+            mountPath: /var/log/
       containers:
-        - name: nginx
-          image: nginx:1.19
-          ports:
-          - containerPort: 80
-          volumeMounts:
-            - name: nfs-volume
-              mountPath: /usr/share/nginx/html/ # Please change the destination you like the share to be mounted too
+      - name: nginx
+        image: nginx:1.19
+        ports:
+        - containerPort: 80
+          protocol: TCP
+        volumeMounts:
+          - name: nginxvolume
+            mountPath: /usr/local/nginx/html/
       volumes:
-        - name: nfs-volume
+        - name: nginxvolume
           nfs:
-            server: 172.16.64.238 # Please change this to your NFS server
-            path: /mnt/hd2
+            server: 172.16.64.238
+            path: /mnt/hd2/nginx
 
 ---
 apiVersion: v1
@@ -39,4 +45,4 @@ spec:
     protocol: TCP
   selector:
     app: nginx
-  type: NodePort #existem 3 tipos de serviços, NodePort, ClusterIP e LoadBalancer
+  type: NodePort
