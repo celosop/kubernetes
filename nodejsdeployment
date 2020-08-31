@@ -14,14 +14,23 @@ spec:
       labels:
         app: nodejs-image-demo
     spec:
+      initContainers:
+      - name: init-shark
+        image: celosop/nodejs-image-demo:5
+        imagePullPolicy: Always
+        command: ['sh', '-c', "cp -rP /home/node/app/* /tmp/"]
+        volumeMounts:
+          - name: nfs-volume-node
+            mountPath: /tmp/
       containers:
         - name: nodejs-image-demo
-          image: celosop/nodejs-image-demo:2
+          image: celosop/nodejs-image-demo:5
+          imagePullPolicy: Always
           ports:
           - containerPort: 8080
           volumeMounts:
             - name: nfs-volume-node
-              mountPath: /home/app # Please change the destination you like the share to be mounted too
+              mountPath: /home/node/app
       volumes:
         - name: nfs-volume-node
           nfs:
@@ -32,11 +41,12 @@ spec:
 apiVersion: v1
 kind: Service #faz com que o kubernetes crie um serviço e exponha a porta 80 do container numa porta aleatória
 metadata:
-  name: nodejs-image-demo
+  name: service-nodejs-demo
 spec:
   ports:
-  - port: 80
+  - port: 8080
     protocol: TCP
+    nodePort: 32222
   selector:
     app: nodejs-image-demo
-  type: NodePort #existem 3 tipos de serviços, NodePort, ClusterIP e LoadBalancer
+  type: NodePort
