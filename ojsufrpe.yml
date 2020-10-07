@@ -115,7 +115,7 @@ spec:
       initContainers:
       - name: init-ojs
         image: celosop/ojsufrpe:3
-        command: ['sh', '-c', "cp -rP /var/www/html /tmp/"]
+        command: ['sh', '-c', "cp -rP /var/www/html/* /tmp/"]
         volumeMounts:
           - name: ojsvolume
             mountPath: /tmp/
@@ -128,7 +128,7 @@ spec:
           protocol: TCP
         volumeMounts:
           - name: ojsvolume
-            mountPath: /var/www/html/html/
+            mountPath: /var/www/html/
       volumes:
         - name: ojsvolume
           nfs:
