@@ -23,6 +23,25 @@ do
         fi
 done
 
+
+#!/bin/bash
+# Script para listar numero de arquivos em cada diretorio em até um subnivel
+ident=`date +%Y%m%d%H%M`
+# Diretorio a ser trabalhado (pasta local se nao for informado)
+pastacaminho='/home/celosop/Documents/'
+
+# Listar somente diretorios
+for DIR in $(ls -d $pastacaminho*/data); do
+        # Contar número de arquivos do diretório
+        NUMDIR=$(ls -lR "$DIR" | grep '^d' | wc -l)
+        NUMLIN=$(ls -lR "$DIR" | grep '^l' | wc -l)
+        NUMARQ=$(ls -lR "$DIR" | grep '^-' | wc -l)
+        # Imprimir saida
+        echo $DIR;
+        tar -czvf $DIR$ident.tar.gz $DIR
+        echo "$DIR: $NUMDIR diretórios, $NUMARQ arquivos e $NUMLIN links simbólicos"
+done
+
 # Deixando o backup FULL desabilitado
 # Realizando o backup FULL para todos os databases
 # mysqldump --password=TKFpoi,@3 --all-databases -c --result-file=/backup/mysql-backup-FULL-$ident.sql > /dev/null
